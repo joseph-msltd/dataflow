@@ -1,0 +1,37 @@
+Explanation about this project can be found here,
+https://www.youtube.com/watch?v=O1NTj4rmQ6Y&list=PLQulb2tvYfMrz8BHGIlyyLvnXo7H4JZBd
+
+
+Create Topic:
+-------------
+gcloud pubsub topics create mytopic --message-storage-policy-allowed-regions=europe-west2
+
+
+Create Bucket:
+--------------
+gcloud storage buckets create gs://pbtogcs_bucket  --default-storage-class=Standard --location=europe-west2 --uniform-bucket-level-access
+
+
+Creatiing Bigquery Dataset:
+---------------------------
+bq --location=europe-west2 mk -d mydemodata123
+
+
+Create Bigquery Table with Schema:
+----------------------------------
+bq mk \
+-t \
+--description "This is my table" \
+<project_id>:mydemodata123.mydemotable \
+date:DATE,confirmed_cases:INTEGER,geo_id:STRING,country_territory_code:STRING
+
+Trigger CF Creation:
+--------------------
+gcloud functions deploy pbtogcs \
+  --gen2 \
+  --region=europe-west2 \
+  --runtime=python39 \
+  --source=./pbtogcs-cf \
+  --entry-point=hello_pubsub \
+  --trigger-topic=bqtopb
+
